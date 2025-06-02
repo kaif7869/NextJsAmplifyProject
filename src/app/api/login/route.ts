@@ -42,6 +42,9 @@ import bcrypt from 'bcryptjs';
 import { NextResponse } from 'next/server';
 import { ddbClient } from '../../utils/dynamodb';
 
+
+export const dynamic = 'force-dynamic';
+
 interface LoginRequestBody {
   email: string;
   password: string;

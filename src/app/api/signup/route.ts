@@ -52,6 +52,9 @@ import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import { ddbClient } from '../../utils/dynamodb';
 
+
+export const dynamic = 'force-dynamic';
+
 interface SignupRequestBody {
   email: string;
   password: string;
