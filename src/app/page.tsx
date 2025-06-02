@@ -92,7 +92,7 @@ export default function HomePage() {
       const data = await res.json();
 
       setMessage(data.message || data.error || 'Something went wrong.');
-    } catch (err) {
+    } catch {
       setMessage('Network error. Please try again.');
     } finally {
       setLoading(false);
