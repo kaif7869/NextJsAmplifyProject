@@ -54,6 +54,7 @@
 
 
 'use client';
+
 import { useState } from 'react';
 
 export default function HomePage() {
@@ -63,26 +64,39 @@ export default function HomePage() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleAuth = async () => {
+    setLoading(true);
+    setMessage('');
+
     const payload: Record<string, string> = {
       email,
       password,
     };
 
+    // Only add firstName and lastName if needed
     if (mode === 'signup') {
+      // Optional: If your backend accepts firstName/lastName, uncomment this:
       payload.firstName = firstName;
       payload.lastName = lastName;
     }
 
-    const res = await fetch(`/api/${mode}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+    try {
+      const res = await fetch(`/api/${mode}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-    const data = await res.json();
-    setMessage(data.message || data.error || 'Something went wrong.');
+      const data = await res.json();
+
+      setMessage(data.message || data.error || 'Something went wrong.');
+    } catch (err) {
+      setMessage('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -125,10 +139,11 @@ export default function HomePage() {
       <button
         className={`${
           mode === 'login' ? 'bg-blue-600' : 'bg-green-600'
-        } text-white px-4 py-2 rounded w-full`}
+        } text-white px-4 py-2 rounded w-full disabled:opacity-50`}
         onClick={handleAuth}
+        disabled={loading}
       >
-        {mode === 'login' ? 'Login' : 'Signup'}
+        {loading ? 'Processing...' : mode === 'login' ? 'Login' : 'Signup'}
       </button>
 
       <p className="mt-4 text-sm">
@@ -144,7 +159,11 @@ export default function HomePage() {
         </button>
       </p>
 
-      {message && <p className="mt-4 text-red-500">{message}</p>}
+      {message && (
+        <p className={`mt-4 text-sm ${message.includes('success') ? 'text-green-600' : 'text-red-500'}`}>
+          {message}
+        </p>
+      )}
     </main>
   );
 }
